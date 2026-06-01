@@ -220,6 +220,9 @@ export function ReportPage({ student, evaluation, rubric, course, teacherName }:
   const grade = evaluation.calculatedGrade;
   const approved = grade >= gradingConfig.napr;
   const pct = calcPercentage(evaluation.rawScore, evaluation.maxRawScore);
+  const fechaStr = course.fechaEvaluacion
+    ? new Date(course.fechaEvaluacion + 'T12:00:00').toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' })
+    : null;
 
   return (
     <Page size="A4" style={s.page}>
@@ -231,6 +234,7 @@ export function ReportPage({ student, evaluation, rubric, course, teacherName }:
           <Text style={s.studentNamePdf}>{student.name}</Text>
           <Text style={s.headerMeta}>
             {course.name}{'  ·  '}{course.subject}{'  ·  '}{course.period}
+            {fechaStr ? `  ·  ${fechaStr}` : ''}
           </Text>
           <Text style={s.headerMeta}>{rubric.name}</Text>
           {teacherName

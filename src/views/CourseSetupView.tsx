@@ -13,6 +13,9 @@ export function CourseSetupView() {
   const [courseName, setCourseName] = useState(activeCourse?.name ?? '');
   const [subject, setSubject] = useState(activeCourse?.subject ?? activeRubric?.rubricMeta?.subject ?? '');
   const [period, setPeriod] = useState(activeCourse?.period ?? '');
+  const [fechaEvaluacion, setFechaEvaluacion] = useState(
+    activeCourse?.fechaEvaluacion ?? new Date().toISOString().slice(0, 10)
+  );
   const [pasteText, setPasteText] = useState('');
   const [parsedRows, setParsedRows] = useState<ReturnType<typeof parseSmartPaste>['rows']>([]);
   const [parseWarnings, setParseWarnings] = useState<string[]>([]);
@@ -59,6 +62,7 @@ export function CourseSetupView() {
         name: courseName.trim(),
         subject: subject.trim(),
         period: period.trim(),
+        fechaEvaluacion: fechaEvaluacion || undefined,
         createdAt: Date.now(),
       };
       await db.courses.add(course);
@@ -158,6 +162,16 @@ export function CourseSetupView() {
             <label className={styles.label} htmlFor="period">Período</label>
             <input id="period" className={styles.input} value={period}
               onChange={e => setPeriod(e.target.value)} placeholder="Ej: 2025-1" />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="fecha-evaluacion">Fecha de Evaluación</label>
+            <input
+              id="fecha-evaluacion"
+              type="date"
+              className={styles.input}
+              value={fechaEvaluacion}
+              onChange={e => setFechaEvaluacion(e.target.value)}
+            />
           </div>
         </div>
       </div>

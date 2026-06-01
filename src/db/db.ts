@@ -54,6 +54,7 @@ export interface Course {
   name: string;
   subject: string;
   period: string;
+  fechaEvaluacion?: string;  // 'YYYY-MM-DD' – fecha en que se rindió la evaluación
   createdAt: number;
 }
 
@@ -107,6 +108,14 @@ class InformeEvaluacionDB extends Dexie {
     super('InformeEvaluacionDB');
 
     this.version(1).stores({
+      rubrics:     'id, name, uploadedAt',
+      courses:     'id, rubricId, name, createdAt',
+      students:    'id, courseId, order',
+      evaluations: 'id, studentId, courseId, rubricId, completedAt',
+    });
+
+    // v2: agrega fechaEvaluacion a courses (campo opcional, no indexado)
+    this.version(2).stores({
       rubrics:     'id, name, uploadedAt',
       courses:     'id, rubricId, name, createdAt',
       students:    'id, courseId, order',

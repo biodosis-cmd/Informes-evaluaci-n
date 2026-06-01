@@ -24,7 +24,19 @@ function buildStudentSection(student: Student, evaluation: Evaluation, rubric: R
   const pct = calcPercentage(evaluation.rawScore, evaluation.maxRawScore);
   const paragraphs: Paragraph[] = [];
 
-  // Título del estudiante
+  // Título de la rúbrica (encabezado del informe)
+  paragraphs.push(
+    new Paragraph({
+      children: [new TextRun({ text: rubric.name, bold: true, size: 22, color: '2563eb', allCaps: true })],
+      heading: HeadingLevel.HEADING_2,
+      spacing: { before: 0, after: 60 },
+      border: {
+        bottom: { style: BorderStyle.SINGLE, size: 6, color: '2563eb', space: 4 },
+      },
+    }),
+  );
+
+  // Nombre del estudiante
   paragraphs.push(
     new Paragraph({
       children: [new TextRun({ text: student.name, bold: true, size: 32, color: '1a1a2e' })],
@@ -33,11 +45,16 @@ function buildStudentSection(student: Student, evaluation: Evaluation, rubric: R
     }),
   );
 
-  // Info del estudiante
+  // Info del estudiante (curso · asignatura · fecha)
+  const fechaStr = course.fechaEvaluacion
+    ? new Date(course.fechaEvaluacion + 'T12:00:00').toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' })
+    : '';
+
   paragraphs.push(
     new Paragraph({
       children: [
         new TextRun({ text: `${course.name} · ${course.subject} · ${course.period}`, color: '6b7280', size: 18 }),
+        ...(fechaStr ? [new TextRun({ text: `   |   Fecha: ${fechaStr}`, color: '6b7280', size: 18 })] : []),
         new TextRun({ text: '   |   ', color: 'd1d5db', size: 18 }),
         new TextRun({ text: `Nota: ${grade.toFixed(1)} / ${rubric.gradingConfig.nmax.toFixed(1)}`, bold: true, size: 20, color: approved ? '059669' : 'dc2626' }),
         new TextRun({ text: `   (${pct}% · ${approved ? 'APROBADO' : 'REPROBADO'})`, size: 18, color: approved ? '059669' : 'dc2626' }),
@@ -194,10 +211,10 @@ export async function exportWordBatch(
     ];
 
     // Insertar tabla después del título "TABLA DE DESEMPEÑO"
-    // Orden de párrafos: [0]=nombre, [1]=info, [2]=docente(opcional), [3 o 2]=sectionTitle, [spacer]
-    // Si hay teacherName → título queda en índice 3 → tabla va en 4
-    // Si no hay teacherName → título queda en índice 2 → tabla va en 3
-    const tableInsertIdx = teacherName ? 4 : 3;
+    // Orden: [0]=rubricTitle, [1]=studentName, [2]=info, [3]=docente(opcional), [4 o 3]=sectionTitle
+    // Con teacherName → sectionTitle en índice 4 → tabla en 5
+    // Sin teacherName → sectionTitle en índice 3 → tabla en 4
+    const tableInsertIdx = teacherName ? 5 : 4;
     sectionChildren.splice(tableInsertIdx, 0, table);
 
     if (si < students.length - 1) {
