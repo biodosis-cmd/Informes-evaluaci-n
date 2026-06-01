@@ -1,0 +1,135 @@
+.container { max-width: 1000px; padding-bottom: 4rem; }
+
+.rubricBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(59,110,248,0.08);
+  border: 1px solid rgba(59,110,248,0.15);
+  border-radius: 0.75rem;
+  margin-bottom: 1.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+.rubricBadgeIcon { font-size: 1.125rem; }
+.rubricBadgeMeta { margin-left: auto; color: var(--color-text-muted); font-size: 0.8rem; }
+
+.section {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle { font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; }
+
+.formGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+.field { display: flex; flex-direction: column; gap: 0.375rem; }
+.label { font-size: 0.8125rem; color: var(--color-text-muted); font-weight: 500; }
+
+.input {
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  transition: border-color var(--transition-base);
+}
+.input:focus { outline: none; border-color: var(--color-primary-500); box-shadow: 0 0 0 3px rgba(59,110,248,0.15); }
+
+.pasteGuide {
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.625rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.875rem;
+  line-height: 1.6;
+}
+.pasteGuide code {
+  background: rgba(59,110,248,0.1);
+  color: var(--color-primary-300);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.pasteArea {
+  width: 100%;
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  border-radius: 0.625rem;
+  padding: 0.875rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  resize: vertical;
+  min-height: 160px;
+  transition: border-color var(--transition-base);
+  line-height: 1.6;
+}
+.pasteArea:focus { outline: none; border-color: var(--color-primary-500); box-shadow: 0 0 0 3px rgba(59,110,248,0.15); }
+
+.pasteActions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.875rem; }
+
+.warnings { display: flex; flex-direction: column; gap: 0.375rem; margin-top: 0.875rem; }
+.warning {
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.15);
+  color: var(--color-warning-400);
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.preview { margin-top: 1.25rem; }
+.previewHeader { font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.75rem; }
+.tableWrap { overflow-x: auto; border-radius: 0.75rem; border: 1px solid var(--color-border-subtle); }
+.previewTable { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.previewTable th { background: var(--color-bg-overlay); padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; color: var(--color-text-muted); border-bottom: 1px solid var(--color-border-subtle); white-space: nowrap; }
+.previewTable td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--color-border-subtle); }
+.previewTable tr:last-child td { border-bottom: none; }
+
+.indexCell { color: var(--color-text-disabled); width: 32px; text-align: center; }
+.sexoCell { color: var(--color-text-muted); width: 48px; text-align: center; }
+.nameCell { font-weight: 500; }
+.scoreCell { text-align: center; font-family: var(--font-mono); color: var(--color-text-secondary); }
+.gradeCell {
+  text-align: center;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+}
+
+.approved { color: var(--color-success-400); }
+.failed { color: var(--color-danger-400); }
+
+.pendingBadge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(107,114,128,0.2);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-sans);
+}
+
+.saveBar {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  gap: 1rem;
+}
+.saveInfo { font-size: 0.875rem; color: var(--color-text-muted); }

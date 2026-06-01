@@ -1,0 +1,79 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.hint {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+  padding: 0.75rem 1rem;
+  background: rgba(59,110,248,0.07);
+  border: 1px solid rgba(59,110,248,0.15);
+  border-radius: 0.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.input {
+  width: 100%;
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  transition: border-color var(--transition-base);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(59,110,248,0.15);
+}
+
+.sexoGroup {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.sexoBtn {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border-default);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-sans);
+}
+
+.sexoBtn:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
+}
+
+.sexoBtnSelected {
+  background: rgba(59,110,248,0.12);
+  border-color: var(--color-primary-500);
+  color: var(--color-primary-300);
+  font-weight: 600;
+}

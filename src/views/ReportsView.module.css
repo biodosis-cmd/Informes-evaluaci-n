@@ -1,0 +1,181 @@
+.container { max-width: 1100px; padding-bottom: 4rem; }
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.title { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.25rem; }
+.subtitle { color: var(--color-text-muted); font-size: 0.875rem; }
+
+.exportActions { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-start; }
+
+/* Summary */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summaryCard {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  text-align: center;
+  transition: border-color var(--transition-base);
+}
+.summaryCard:hover { border-color: var(--color-border-default); }
+
+.summaryVal {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.summaryLbl { font-size: 0.75rem; color: var(--color-text-muted); font-weight: 500; }
+.successVal { color: var(--color-success-400); }
+.failVal    { color: var(--color-danger-400); }
+
+/* Warning bar */
+.warningBar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.15);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-warning-400);
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.warningLink {
+  background: none;
+  border: none;
+  color: var(--color-primary-400);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0;
+  transition: color var(--transition-base);
+}
+.warningLink:hover { color: var(--color-primary-300); }
+
+/* Table section */
+.tableSection {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.selectAll {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.selectAll input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary-500);
+  cursor: pointer;
+}
+
+.selectionInfo { font-size: 0.8125rem; color: var(--color-text-muted); }
+
+.tableWrap { overflow-x: auto; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+
+.table th {
+  background: var(--color-bg-overlay);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border-subtle);
+  white-space: nowrap;
+}
+
+.thCheck { width: 40px; }
+.thCenter { text-align: center; }
+
+.row {
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.row:hover td { background: rgba(255,255,255,0.02); }
+.rowSelected td { background: rgba(59,110,248,0.05); }
+.row:last-child td { border-bottom: none; }
+
+.row td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--color-border-subtle); }
+
+.tdCheck { width: 40px; text-align: center; }
+.tdCheck input[type='checkbox'] { width: 15px; height: 15px; accent-color: var(--color-primary-500); cursor: pointer; }
+
+.tdName { font-weight: 500; }
+.nameText { white-space: nowrap; }
+
+.tdCenter { text-align: center; }
+.monoText { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--color-text-secondary); }
+
+/* Pct bar */
+.pctBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 80px;
+}
+
+.pctFill {
+  height: 4px;
+  border-radius: 2px;
+  flex: 1;
+  max-width: 60px;
+  transition: width 0.3s ease;
+}
+
+.pctLabel { font-size: 0.75rem; font-family: var(--font-mono); color: var(--color-text-muted); white-space: nowrap; }
+
+/* Grade */
+.grade { font-size: 1.125rem; font-weight: 800; font-family: var(--font-mono); }
+.approved { color: var(--color-success-400); }
+.failed   { color: var(--color-danger-400); }
+
+/* Status pill */
+.statusPill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.pillApproved { background: rgba(16,185,129,0.12); color: var(--color-success-400); }
+.pillFailed   { background: rgba(239,68,68,0.12);  color: var(--color-danger-400); }
+
+.feedbackOk { color: var(--color-success-400); font-weight: 700; }
+.feedbackNo { color: var(--color-text-disabled); }

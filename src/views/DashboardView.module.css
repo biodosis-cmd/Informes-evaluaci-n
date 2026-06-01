@@ -1,0 +1,304 @@
+.container {
+  max-width: 1100px;
+  padding-bottom: 4rem;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  padding: 2.5rem 2.5rem 2rem;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1.25rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.heroContent { position: relative; z-index: 1; max-width: 620px; }
+
+.heroTitle {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitle {
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.heroCta { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+.teacherChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+.teacherChip:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-default);
+  color: var(--color-text-primary);
+}
+
+.teacherChipEdit { margin-left: 0.25rem; font-size: 0.75rem; opacity: 0.6; }
+
+.teacherChipEmpty {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: 0.8125rem;
+}
+
+.heroDecoration {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  right: -80px;
+  top: -80px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,110,248,0.12) 0%, transparent 70%);
+}
+
+.orb2 {
+  position: absolute;
+  right: 80px;
+  bottom: -40px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%);
+}
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1rem;
+  transition: border-color var(--transition-base);
+}
+.statCard:hover { border-color: var(--color-border-default); }
+
+.statIcon { font-size: 1.75rem; }
+
+.statValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.statLabel {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  margin-top: 0.125rem;
+}
+
+/* Section */
+.section { margin-bottom: 2.5rem; }
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+}
+
+/* Workflow */
+.workflow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.workflowStep {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background var(--transition-base);
+  flex-shrink: 0;
+  min-width: 140px;
+}
+.workflowStep:hover { background: var(--color-bg-hover); }
+
+.stepNumber {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(59,110,248,0.15);
+  color: var(--color-primary-400);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepIcon { font-size: 1.25rem; flex-shrink: 0; }
+
+.stepContent { min-width: 0; }
+
+.stepTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.stepDesc {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 1px;
+}
+
+.stepArrow {
+  color: var(--color-text-disabled);
+  font-size: 1.25rem;
+  margin: 0 0.25rem;
+  flex-shrink: 0;
+}
+
+/* Grid cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem 1.125rem;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+.card:hover {
+  border-color: var(--color-border-default);
+  background: var(--color-bg-overlay);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.cardIcon { font-size: 1.5rem; flex-shrink: 0; }
+
+.cardContent { flex: 1; min-width: 0; }
+
+.cardTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardMeta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.cardDate {
+  font-size: 0.7rem;
+  color: var(--color-text-disabled);
+  margin-top: 2px;
+}
+
+.cardArrow { color: var(--color-text-muted); font-size: 1.25rem; flex-shrink: 0; }
+
+/* Delete button */
+.deleteBtn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--color-text-disabled);
+  opacity: 0;
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+
+.card:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  background: rgba(239,68,68,0.12);
+  border-color: rgba(239,68,68,0.3);
+  color: var(--color-danger-400);
+}
+
+/* Delete modal */
+.deleteModalBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+}
+
+.deleteModalIcon { font-size: 2.5rem; line-height: 1; }
+
+.deleteModalBody p {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.deleteModalWarning {
+  font-size: 0.8125rem !important;
+  color: var(--color-danger-400) !important;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+}
+
