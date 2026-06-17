@@ -70,6 +70,7 @@ export function CourseSetupView() {
       const students: Student[] = parsedRows.map((row, i) => ({
         id: uuidv4(),
         courseId,
+        rut: row.rut,
         name: row.name,
         sexo: row.sexo,
         order: i,
@@ -180,7 +181,7 @@ export function CourseSetupView() {
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Smart Paste de Estudiantes</h2>
         <div className={styles.pasteGuide}>
-          <strong>Formato esperado:</strong> Copia desde Excel con columnas: <code>Sexo | Nombre | Indicador 1 | Indicador 2 | ...</code>
+          <strong>Formato esperado:</strong> Copia desde Excel con columnas: <code>RUT | Sexo | Nombre | Indicador 1 | Indicador 2 | ...</code>
           <br /><small>Sexo: H/M, Hombre/Mujer o Masculino/Femenino</small>
         </div>
         <textarea
@@ -218,6 +219,7 @@ export function CourseSetupView() {
                 <thead>
                   <tr>
                     <th>#</th>
+                    <th>RUT</th>
                     <th>Sexo</th>
                     <th>Nombre</th>
                     {activeRubric.rubricData.criteria.map((c, i) => (
@@ -238,6 +240,7 @@ export function CourseSetupView() {
                     return (
                       <tr key={i}>
                         <td className={styles.indexCell}>{i + 1}</td>
+                        <td className={styles.nameCell}>{row.rut}</td>
                         <td className={styles.sexoCell}>{row.sexo || '—'}</td>
                         <td className={styles.nameCell}>{row.name}</td>
                         {row.scores.map((s, si) => <td key={si} className={styles.scoreCell}>{row.isPending ? '—' : s}</td>)}

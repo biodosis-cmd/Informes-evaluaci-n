@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { Button } from '../components/ui/Button';
 import { calcPercentage } from '../grading/GradingEngine';
+import { publishToSheets } from '../export/sheetsExporter';
 import styles from './ReportsView.module.css';
 
 export function ReportsView() {
-  const { activeRubric, activeCourse, students, evaluations, teacher, setView } = useStore();
+  const { activeRubric, activeCourse, students, evaluations, teacher, setView, addToast } = useStore();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [exporting, setExporting] = useState<'pdf' | 'word' | null>(null);
+  const [exporting, setExporting] = useState<'pdf' | 'word' | 'sheets' | null>(null);
 
   if (!activeRubric || !activeCourse || students.length === 0) {
     return (
@@ -69,6 +70,20 @@ export function ReportsView() {
     }
   };
 
+  const handlePublishSheets = async () => {
+    setExporting('sheets');
+    try {
+      const evals = exportTargets.map(s => evalMap.get(s.id)!).filter(Boolean);
+      await publishToSheets(exportTargets, evals, activeRubric, activeCourse);
+      addToast({ type: 'success', message: '¡Datos publicados exitosamente en el Portal web!' });
+    } catch (err) {
+      console.error('Sheets publish error:', err);
+      addToast({ type: 'error', message: 'Error al conectar con el servidor web.' });
+    } finally {
+      setExporting(null);
+    }
+  };
+
   const avg = evaluations.length > 0
     ? (evaluations.reduce((s, e) => s + e.calculatedGrade, 0) / evaluations.length)
     : 0;
@@ -85,6 +100,16 @@ export function ReportsView() {
           </p>
         </div>
         <div className={styles.exportActions}>
+          <Button
+            id="publish-sheets-btn"
+            onClick={handlePublishSheets}
+            loading={exporting === 'sheets'}
+            disabled={exporting !== null}
+            icon="☁️"
+            variant="primary"
+          >
+            Publicar al Portal Web
+          </Button>
           <Button
             id="export-pdf-btn"
             onClick={handleExportPDF}

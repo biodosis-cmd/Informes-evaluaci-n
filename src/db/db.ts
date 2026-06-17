@@ -63,6 +63,7 @@ export type Sexo = 'M' | 'F' | '';
 export interface Student {
   id: string;
   courseId: string;
+  rut?: string;
   name: string;
   sexo: Sexo;
   order: number;

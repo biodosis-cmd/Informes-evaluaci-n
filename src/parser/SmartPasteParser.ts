@@ -1,6 +1,7 @@
 import type { Sexo } from '../db/db';
 
 export interface SmartPasteRow {
+  rut: string;
   sexo: Sexo;
   name: string;
   scores: number[]; // un valor por criterio, en orden
@@ -21,9 +22,21 @@ const SEXO_MAP: Record<string, Sexo> = {
   '1': 'M', '2': 'F',
 };
 
+function formatRut(rawRut: string): string {
+  // Limpia el RUT dejando solo números y la letra K
+  const cleanRut = rawRut.replace(/[^0-9kK]/g, '').toUpperCase();
+  if (cleanRut.length < 2) return cleanRut;
+  
+  // Extrae el dígito verificador y el cuerpo del RUT
+  const dv = cleanRut.slice(-1);
+  const cuerpo = cleanRut.slice(0, -1);
+  
+  return `${cuerpo}-${dv}`;
+}
+
 /**
- * Parsea texto pegado desde Excel (TSV) con formato:
- * Sexo | Nombre | Indicador1 | Indicador2 | ... | IndicadorN
+ * Parsea texto pegado desde Excel (TSV) con formato estricto:
+ * RUT | Sexo | Nombre | Indicador1 | Indicador2 | ... | IndicadorN
  */
 export function parseSmartPaste(rawText: string, expectedCriteriaCount: number): SmartPasteResult {
   const errors: string[] = [];
@@ -39,41 +52,37 @@ export function parseSmartPaste(rawText: string, expectedCriteriaCount: number):
     const lineNum = i + 1;
     const cells = lines[i].split('\t').map(c => c.trim());
 
-    if (cells.length < 2) {
-      warnings.push(`Fila ${lineNum}: ignorada (menos de 2 columnas)`);
+    if (cells.length < 3) {
+      warnings.push(`Fila ${lineNum}: ignorada (se esperan al menos 3 columnas: RUT, Sexo, Nombre)`);
       continue;
     }
 
-    // Detectar si tiene columna de sexo
-    let sexo: Sexo = '';
-    let nameColIndex = 0;
-    let scoresStartIndex = 1;
-
-    const firstCell = cells[0].toLowerCase();
-    if (SEXO_MAP[firstCell] !== undefined) {
-      sexo = SEXO_MAP[firstCell];
-      nameColIndex = 1;
-      scoresStartIndex = 2;
-    } else if (!isNaN(Number(cells[0])) && cells.length > 2) {
-      // Podría ser nombre en col[1], scores desde col[2]
-      // Pero también podría ser nombre en col[0] sin sexo
-      // Heurística: si col[0] es número puro pequeño (<= 2), tratar como sexo
-      const n = Number(cells[0]);
-      if (n === 1 || n === 2) {
-        sexo = n === 1 ? 'M' : 'F';
-        nameColIndex = 1;
-        scoresStartIndex = 2;
-      }
+    // RUT
+    const rutCell = cells[0];
+    const rut = formatRut(rutCell);
+    if (!rut) {
+      warnings.push(`Fila ${lineNum}: RUT inválido o vacío, ignorada`);
+      continue;
     }
 
-    const name = cells[nameColIndex] ?? '';
+    // Sexo
+    let sexo: Sexo = '';
+    const sexoCell = cells[1].toLowerCase();
+    if (SEXO_MAP[sexoCell] !== undefined) {
+      sexo = SEXO_MAP[sexoCell];
+    } else {
+      warnings.push(`Fila ${lineNum}: sexo no reconocido ("${cells[1]}"), se dejará en blanco.`);
+    }
+
+    // Nombre
+    const name = cells[2] ?? '';
     if (!name) {
       warnings.push(`Fila ${lineNum}: nombre vacío, ignorada`);
       continue;
     }
 
-    // Scores numéricos
-    const scoreStrings = cells.slice(scoresStartIndex);
+    // Scores numéricos (desde la columna 3 en adelante)
+    const scoreStrings = cells.slice(3);
     const scores: number[] = [];
 
     for (const s of scoreStrings) {
@@ -97,6 +106,7 @@ export function parseSmartPaste(rawText: string, expectedCriteriaCount: number):
     const isPending = scores.length === 0 || scores.every(s => s === 0);
 
     rows.push({
+      rut,
       sexo,
       name,
       scores: isPending ? new Array(expectedCriteriaCount).fill(0) : scores.slice(0, expectedCriteriaCount),
@@ -110,3 +120,4 @@ export function parseSmartPaste(rawText: string, expectedCriteriaCount: number):
 
   return { rows, errors, warnings };
 }
+
