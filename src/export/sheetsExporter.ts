@@ -1,6 +1,6 @@
 import type { Student, Evaluation, Rubric, Course } from '../db/db';
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzFcj0de624TVr-qJw2zl9HT0A0eYgz5FuJ7k1NBBrDtRO7sDmjfaygu0gyJE8zCxc/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx6qHkRSE1l3_k-rP_3a3k4cbba37QI1CIzXIcN5zHM0tFIPQW74Akc8qgzhiOXyEjQ/exec";
 
 export async function publishToSheets(
   students: Student[],
