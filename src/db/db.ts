@@ -65,6 +65,8 @@ export interface Student {
   courseId: string;
   rut?: string;
   name: string;
+  apellido_paterno?: string;
+  apellido_materno?: string;
   sexo: Sexo;
   order: number;
 }

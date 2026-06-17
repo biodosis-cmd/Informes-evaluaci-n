@@ -72,6 +72,8 @@ export function CourseSetupView() {
         courseId,
         rut: row.rut,
         name: row.name,
+        apellido_paterno: row.apellido_paterno,
+        apellido_materno: row.apellido_materno,
         sexo: row.sexo,
         order: i,
       }));
@@ -181,7 +183,7 @@ export function CourseSetupView() {
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Smart Paste de Estudiantes</h2>
         <div className={styles.pasteGuide}>
-          <strong>Formato esperado:</strong> Copia desde Excel con columnas: <code>RUT | Sexo | Nombre | Indicador 1 | Indicador 2 | ...</code>
+          <strong>Formato esperado:</strong> Copia desde Excel con columnas: <code>RUT | Apellido Paterno | Apellido Materno | Nombres | Sexo | Indicador 1 | Indicador 2 | ...</code>
           <br /><small>Sexo: H/M, Hombre/Mujer o Masculino/Femenino</small>
         </div>
         <textarea
@@ -220,8 +222,10 @@ export function CourseSetupView() {
                   <tr>
                     <th>#</th>
                     <th>RUT</th>
+                    <th>Ap. Paterno</th>
+                    <th>Ap. Materno</th>
+                    <th>Nombres</th>
                     <th>Sexo</th>
-                    <th>Nombre</th>
                     {activeRubric.rubricData.criteria.map((c, i) => (
                       <th key={c.id} title={c.label}>Ind. {i + 1}</th>
                     ))}
@@ -241,8 +245,10 @@ export function CourseSetupView() {
                       <tr key={i}>
                         <td className={styles.indexCell}>{i + 1}</td>
                         <td className={styles.nameCell}>{row.rut}</td>
-                        <td className={styles.sexoCell}>{row.sexo || '—'}</td>
+                        <td className={styles.nameCell}>{row.apellido_paterno}</td>
+                        <td className={styles.nameCell}>{row.apellido_materno}</td>
                         <td className={styles.nameCell}>{row.name}</td>
+                        <td className={styles.sexoCell}>{row.sexo || '—'}</td>
                         {row.scores.map((s, si) => <td key={si} className={styles.scoreCell}>{row.isPending ? '—' : s}</td>)}
                         {row.isPending ? (
                           <td className={styles.gradeCell}>

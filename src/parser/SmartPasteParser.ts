@@ -2,8 +2,10 @@ import type { Sexo } from '../db/db';
 
 export interface SmartPasteRow {
   rut: string;
+  apellido_paterno: string;
+  apellido_materno: string;
+  name: string; // Nombres
   sexo: Sexo;
-  name: string;
   scores: number[]; // un valor por criterio, en orden
   isPending: boolean;
 }
@@ -36,7 +38,7 @@ function formatRut(rawRut: string): string {
 
 /**
  * Parsea texto pegado desde Excel (TSV) con formato estricto:
- * RUT | Sexo | Nombre | Indicador1 | Indicador2 | ... | IndicadorN
+ * RUT | Apellido Paterno | Apellido Materno | Nombres | Sexo | Indicador1 | Indicador2 | ...
  */
 export function parseSmartPaste(rawText: string, expectedCriteriaCount: number): SmartPasteResult {
   const errors: string[] = [];
@@ -52,12 +54,12 @@ export function parseSmartPaste(rawText: string, expectedCriteriaCount: number):
     const lineNum = i + 1;
     const cells = lines[i].split('\t').map(c => c.trim());
 
-    if (cells.length < 3) {
-      warnings.push(`Fila ${lineNum}: ignorada (se esperan al menos 3 columnas: RUT, Sexo, Nombre)`);
+    if (cells.length < 5) {
+      warnings.push(`Fila ${lineNum}: ignorada (se esperan al menos 5 columnas: RUT, Paterno, Materno, Nombres, Sexo)`);
       continue;
     }
 
-    // RUT
+    // RUT (Columna 0)
     const rutCell = cells[0];
     const rut = formatRut(rutCell);
     if (!rut) {
@@ -65,24 +67,29 @@ export function parseSmartPaste(rawText: string, expectedCriteriaCount: number):
       continue;
     }
 
-    // Sexo
-    let sexo: Sexo = '';
-    const sexoCell = cells[1].toLowerCase();
-    if (SEXO_MAP[sexoCell] !== undefined) {
-      sexo = SEXO_MAP[sexoCell];
-    } else {
-      warnings.push(`Fila ${lineNum}: sexo no reconocido ("${cells[1]}"), se dejará en blanco.`);
-    }
-
-    // Nombre
-    const name = cells[2] ?? '';
-    if (!name) {
-      warnings.push(`Fila ${lineNum}: nombre vacío, ignorada`);
+    // Paterno (Columna 1)
+    const apellido_paterno = cells[1]?.trim() ?? '';
+    // Materno (Columna 2)
+    const apellido_materno = cells[2]?.trim() ?? '';
+    
+    // Nombres (Columna 3)
+    const name = cells[3]?.trim() ?? '';
+    if (!name && !apellido_paterno) {
+      warnings.push(`Fila ${lineNum}: nombre y apellido vacíos, ignorada`);
       continue;
     }
 
-    // Scores numéricos (desde la columna 3 en adelante)
-    const scoreStrings = cells.slice(3);
+    // Sexo (Columna 4)
+    let sexo: Sexo = '';
+    const sexoCell = cells[4].toLowerCase();
+    if (SEXO_MAP[sexoCell] !== undefined) {
+      sexo = SEXO_MAP[sexoCell];
+    } else {
+      warnings.push(`Fila ${lineNum}: sexo no reconocido ("${cells[4]}"), se dejará en blanco.`);
+    }
+
+    // Scores numéricos (desde la columna 5 en adelante)
+    const scoreStrings = cells.slice(5);
     const scores: number[] = [];
 
     for (const s of scoreStrings) {
@@ -107,8 +114,10 @@ export function parseSmartPaste(rawText: string, expectedCriteriaCount: number):
 
     rows.push({
       rut,
-      sexo,
+      apellido_paterno,
+      apellido_materno,
       name,
+      sexo,
       scores: isPending ? new Array(expectedCriteriaCount).fill(0) : scores.slice(0, expectedCriteriaCount),
       isPending,
     });
