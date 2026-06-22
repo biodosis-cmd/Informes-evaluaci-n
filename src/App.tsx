@@ -38,7 +38,9 @@ function ViewRouter() {
 export default function App() {
   return (
     <div className="app-layout">
-      <Sidebar />
+      <div className="app-sidebar">
+        <Sidebar />
+      </div>
       <div className="app-main">
         <ViewRouter />
       </div>

@@ -33,6 +33,11 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  text-align: left !important;
+  border: none !important;
 }
 
 /* ── Tipografía ── */
@@ -110,8 +115,7 @@ code, pre {
 
 .app-content {
   flex: 1;
-  padding: var(--space-8);
-  max-width: var(--content-max-w);
+  padding: var(--space-6) var(--space-8);
   width: 100%;
 }
 

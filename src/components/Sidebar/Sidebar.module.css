@@ -57,40 +57,34 @@
   margin: 0 1rem;
 }
 
-/* Flow status */
-.flowStatus {
-  padding: 0.75rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-
-.statusItem {
+/* Context header (curso activo) */
+.contextHeader {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem 0.25rem;
 }
 
-.statusDot {
+.contextDot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
+  background: var(--color-success-500);
+  box-shadow: 0 0 4px rgba(16, 185, 129, 0.6);
 }
 
-.done .statusDot    { background: var(--color-success-500); }
-.pending .statusDot { background: var(--color-text-disabled); }
-
-.statusLabel {
+.contextLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
   color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 190px;
+  max-width: 170px;
 }
-
-.done .statusLabel { color: var(--color-text-secondary); }
 
 /* Navigation */
 .nav {
