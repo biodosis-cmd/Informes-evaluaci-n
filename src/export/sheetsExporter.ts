@@ -2,8 +2,10 @@ import type { Student, Evaluation, Rubric, Course } from '../db/db';
 
 const API_URL = "https://script.google.com/macros/s/AKfycbx6qHkRSE1l3_k-rP_3a3k4cbba37QI1CIzXIcN5zHM0tFIPQW74Akc8qgzhiOXyEjQ/exec";
 
-// 🔐 Clave secreta — debe coincidir con la pestaña CONFIG_SEGURIDAD del Google Sheets
-const API_KEY = "EF2026-rDhuAXowoF9jfR9DZwJy";
+// 🔐 Obtener la clave secreta desde la sesión (entregada por el login docente)
+function _getApiKey(): string {
+  return sessionStorage.getItem('ef_api_key') || '';
+}
 
 export async function publishToSheets(
   students: Student[],
@@ -11,9 +13,14 @@ export async function publishToSheets(
   rubric: Rubric,
   course: Course
 ): Promise<any> {
+  const apiKey = _getApiKey();
+  if (!apiKey) {
+    throw new Error('No hay sesión activa. Por favor, inicia sesión nuevamente.');
+  }
+
   const payload = {
     action: 'publishToPortal',
-    api_key: API_KEY,
+    api_key: apiKey,
     course,
     rubric,
     students,
@@ -39,3 +46,27 @@ export async function publishToSheets(
   }
 }
 
+// 🔐 Verificar contraseña de docente contra el backend
+export async function verifyDocentePassword(password: string): Promise<string> {
+  const url = `${API_URL}?action=verifyDocente&password=${encodeURIComponent(password)}`;
+  const response = await fetch(url);
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || 'Contraseña incorrecta.');
+  }
+
+  const apiKey = result.data.api_key;
+  sessionStorage.setItem('ef_api_key', apiKey);
+  return apiKey;
+}
+
+// 🔐 Cerrar sesión docente
+export function logoutDocente() {
+  sessionStorage.removeItem('ef_api_key');
+}
+
+// 🔐 Verificar si hay sesión activa
+export function isDocenteLoggedIn(): boolean {
+  return !!sessionStorage.getItem('ef_api_key');
+}
