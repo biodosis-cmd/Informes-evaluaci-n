@@ -2,6 +2,9 @@ import type { Student, Evaluation, Rubric, Course } from '../db/db';
 
 const API_URL = "https://script.google.com/macros/s/AKfycbx6qHkRSE1l3_k-rP_3a3k4cbba37QI1CIzXIcN5zHM0tFIPQW74Akc8qgzhiOXyEjQ/exec";
 
+// 🔐 Clave secreta — debe coincidir con la pestaña CONFIG_SEGURIDAD del Google Sheets
+const API_KEY = "EF2026-rDhuAXowoF9jfR9DZwJy";
+
 export async function publishToSheets(
   students: Student[],
   evaluations: Evaluation[],
@@ -10,6 +13,7 @@ export async function publishToSheets(
 ): Promise<any> {
   const payload = {
     action: 'publishToPortal',
+    api_key: API_KEY,
     course,
     rubric,
     students,
@@ -34,3 +38,4 @@ export async function publishToSheets(
     throw err;
   }
 }
+
