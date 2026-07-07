@@ -1,5 +1,7 @@
+import { useRef, useState } from 'react';
 import { useStore } from '../../store/useStore';
 import type { AppView } from '../../store/useStore';
+import { exportDBToFile, importDBFromFile } from '../../db/backup';
 import styles from './Sidebar.module.css';
 
 interface NavItem {
@@ -25,12 +27,55 @@ const CONTEXT_ITEMS: NavItem[] = [
 ];
 
 export function Sidebar() {
-  const { activeView, setView, activeRubric, activeCourse } = useStore();
+  const { activeView, setView, activeRubric, activeCourse, addToast } = useStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const hasContext = !!(activeRubric && activeCourse);
 
   const handleNav = (item: NavItem) => {
     if (item.requiresContext && !hasContext) return;
     setView(item.view);
+  };
+
+  const handleExport = async () => {
+    try {
+      setIsProcessing(true);
+      await exportDBToFile();
+      addToast({ type: 'success', message: 'Respaldo descargado exitosamente.' });
+    } catch (err: any) {
+      addToast({ type: 'error', message: err.message || 'Error al exportar.' });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsProcessing(true);
+      await importDBFromFile(file);
+      addToast({ type: 'success', message: 'Datos restaurados con éxito. Recargando...' });
+      
+      // Recargar la página después de 1.5s para que los estados (Zustand) se refresquen con la nueva base de datos
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+      
+    } catch (err: any) {
+      addToast({ type: 'error', message: err.message || 'Error al importar datos.' });
+    } finally {
+      setIsProcessing(false);
+      // Limpiar el input
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -92,6 +137,36 @@ export function Sidebar() {
       </nav>
 
       <div className={styles.spacer} />
+
+      {/* Sección de Backups */}
+      <div className={styles.backupSection}>
+        <div className={styles.backupTitle}>Datos (Local)</div>
+        <button 
+          className={styles.backupBtn} 
+          onClick={handleExport}
+          disabled={isProcessing}
+          title="Descargar todos tus datos en un archivo JSON"
+        >
+          <span className={styles.backupIcon}>💾</span>
+          <span>Respaldar</span>
+        </button>
+        <button 
+          className={styles.backupBtn} 
+          onClick={handleImportClick}
+          disabled={isProcessing}
+          title="Subir un archivo de respaldo (restaurar datos)"
+        >
+          <span className={styles.backupIcon}>📂</span>
+          <span>Restaurar</span>
+        </button>
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          accept="application/json"
+          onChange={handleFileChange}
+        />
+      </div>
 
       {/* Footer */}
       <div className={styles.footer}>
