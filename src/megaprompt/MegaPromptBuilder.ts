@@ -174,6 +174,122 @@ export function buildMegaPrompt(params: MegaPromptParams): string {
   return lines.join('\n');
 }
 
+/**
+ * Genera un Mega Prompt para UN SOLO estudiante.
+ * Incluye la rúbrica completa pero solo los datos de ese alumno.
+ */
+export function buildSingleStudentPrompt(params: MegaPromptParams, studentId: string): string {
+  const { rubric, course, students, evaluations, teacher } = params;
+  const { rubricData, gradingConfig } = rubric;
+
+  const student = students.find(s => s.id === studentId);
+  if (!student) return 'Estudiante no encontrado.';
+
+  const ev = evaluations.find(e => e.studentId === studentId);
+  if (!ev || ev.isPending) return 'El estudiante no tiene evaluación completada.';
+
+  const teacherName = teacher?.name?.trim() || 'el/la docente';
+  const lines: string[] = [];
+
+  // Rol
+  lines.push('━'.repeat(60));
+  lines.push('  ROL Y TAREA');
+  lines.push('━'.repeat(60));
+
+  if (teacher?.name && teacher?.sexo) {
+    const genLabel = teacher.sexo === 'M' ? 'profesor' : 'profesora';
+    lines.push(`Debes escribir el feedback EN PRIMERA PERSONA, como si fueras ${genLabel} ${teacherName}.`);
+    lines.push(`Género del docente: ${teacher.sexo === 'M' ? 'Masculino' : 'Femenino'}.`);
+  } else {
+    lines.push('Debes escribir el feedback EN PRIMERA PERSONA, como si fueras el/la docente.');
+  }
+  lines.push('');
+  lines.push('Eres experto/a en evaluación formativa para el sistema escolar chileno.');
+  lines.push('Tu tarea es generar feedback personalizado, empático y orientado al crecimiento.');
+  lines.push('');
+
+  // Rúbrica
+  lines.push('━'.repeat(60));
+  lines.push(`  RÚBRICA: ${rubric.name}`);
+  if (course.subject) lines.push(`  Asignatura: ${course.subject}`);
+  if (course.name) lines.push(`  Curso: ${course.name}`);
+  lines.push('━'.repeat(60));
+  lines.push('');
+  lines.push('CRITERIOS Y NIVELES DE LOGRO:');
+  lines.push('');
+
+  rubricData.criteria.forEach((crit, ci) => {
+    lines.push(`Criterio ${ci + 1}: "${crit.label}"`);
+    rubricData.levels.forEach(level => {
+      const desc = crit.descriptors[level.id] || '(sin descriptor)';
+      lines.push(`  • ${level.label} (${level.maxScore} pts):`);
+      lines.push(`    "${desc}"`);
+    });
+    lines.push('');
+  });
+
+  // Datos del estudiante
+  lines.push('━'.repeat(60));
+  lines.push('  DESEMPEÑO DEL ESTUDIANTE');
+  lines.push('━'.repeat(60));
+  lines.push('');
+
+  const sexoLabel = student.sexo === 'M' ? 'Masculino' : student.sexo === 'F' ? 'Femenino' : 'No especificado';
+  const gradeStr = ev.calculatedGrade.toFixed(1);
+  const pct = Math.round((ev.rawScore / ev.maxRawScore) * 100);
+
+  lines.push(`ESTUDIANTE [ID: "${student.id}"]`);
+  lines.push(`Nombre: ${student.name} | Sexo: ${sexoLabel} | Nota: ${gradeStr} / ${gradingConfig.nmax.toFixed(1)} (${pct}%)`);
+  if (ev.observations && ev.observations.trim().length > 0) {
+    lines.push(`Contexto / Observaciones: "${ev.observations.trim()}"`);
+  }
+  lines.push('');
+
+  rubricData.criteria.forEach(crit => {
+    const score = ev.scores[crit.id];
+    if (!score) return;
+    const levelLabel = rubricData.levels.find(l => l.id === score.levelId)?.label ?? 'Desconocido';
+    lines.push(`  · ${crit.label} → ${levelLabel} (${score.score} pts):`);
+    lines.push(`    "${score.descriptor}"`);
+  });
+  lines.push('');
+
+  // Instrucciones
+  lines.push('━'.repeat(60));
+  lines.push('  INSTRUCCIONES DE FORMATO');
+  lines.push('━'.repeat(60));
+  lines.push('');
+  lines.push('Genera EXACTAMENTE tres campos:');
+  lines.push('1. "strength"   → Punto Fuerte (2-3 oraciones)');
+  lines.push('2. "challenge"  → Desafío Principal (2-3 oraciones)');
+  lines.push('3. "suggestion" → Sugerencia Accionable (1-2 oraciones)');
+  lines.push('');
+  lines.push('Tono: profesional, empático, español chileno. Usa "tú".');
+  lines.push('');
+
+  // JSON esperado
+  lines.push('━'.repeat(60));
+  lines.push('  RESPONDE SOLO CON ESTE JSON');
+  lines.push('━'.repeat(60));
+  lines.push('');
+
+  const schema = {
+    courseId: course.id,
+    generatedAt: '<ISO 8601 timestamp>',
+    feedbacks: [{
+      studentId: student.id,
+      strength: 'Texto del punto fuerte aquí...',
+      challenge: 'Texto del desafío principal aquí...',
+      suggestion: 'Texto de la sugerencia accionable aquí...',
+    }]
+  };
+
+  lines.push(JSON.stringify(schema, null, 2));
+  lines.push('');
+
+  return lines.join('\n');
+}
+
 /* ── Tipos del JSON esperado ── */
 export interface MegaPromptFeedbackItem {
   studentId: string;
@@ -187,3 +303,4 @@ export interface MegaPromptResponse {
   generatedAt: string;
   feedbacks: MegaPromptFeedbackItem[];
 }
+

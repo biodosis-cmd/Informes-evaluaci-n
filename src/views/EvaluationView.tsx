@@ -5,10 +5,11 @@ import { useStore } from '../store/useStore';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { calculateGrade, calcRawScore } from '../grading/GradingEngine';
+import { buildSingleStudentPrompt } from '../megaprompt/MegaPromptBuilder';
 import styles from './EvaluationView.module.css';
 
 export function EvaluationView() {
-  const { activeRubric, activeCourse, students, evaluations, setEvaluations, setView } = useStore();
+  const { activeRubric, activeCourse, students, evaluations, setEvaluations, setView, teacher, addToast } = useStore();
   const [saving, setSaving] = useState<string | null>(null);
   const [obsModalId, setObsModalId] = useState<string | null>(null);
   const [obsText, setObsText] = useState('');
@@ -214,11 +215,34 @@ export function EvaluationView() {
                   </td>
 
                   <td className={styles.tdFeedback}>
-                    {hasFeedback ? (
-                      <span className={styles.feedbackDone} title="Feedback importado">✓</span>
-                    ) : (
-                      <span className={styles.feedbackPending}>—</span>
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
+                      {hasFeedback ? (
+                        <span className={styles.feedbackDone} title="Feedback importado">✓</span>
+                      ) : (
+                        <span className={styles.feedbackPending}>—</span>
+                      )}
+                      {!ev?.isPending && ev && (
+                        <button
+                          className={styles.miniPromptBtn}
+                          title="Generar prompt IA individual"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            const prompt = buildSingleStudentPrompt(
+                              { rubric: activeRubric, course: activeCourse, students, evaluations, teacher },
+                              student.id
+                            );
+                            try {
+                              await navigator.clipboard.writeText(prompt);
+                              addToast({ type: 'success', message: `🤖 Prompt de ${student.name} copiado al portapapeles` });
+                            } catch {
+                              addToast({ type: 'error', message: 'No se pudo copiar.' });
+                            }
+                          }}
+                        >
+                          🤖
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
