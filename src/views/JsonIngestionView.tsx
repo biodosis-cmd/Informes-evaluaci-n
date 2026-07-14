@@ -23,7 +23,7 @@ export function JsonIngestionView() {
   const validation = validateJsonIngestion(rawJson, expectedIds);
 
   const handleImport = useCallback(async () => {
-    if (!validation.data || validation.status !== 'valid') return;
+    if (!validation.data || (validation.status !== 'valid' && validation.status !== 'partial')) return;
     setImporting(true);
     try {
       const feedbackMap = new Map(validation.data.feedbacks.map(f => [f.studentId, f]));
