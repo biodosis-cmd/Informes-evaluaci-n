@@ -89,7 +89,7 @@ export function buildMegaPrompt(params: MegaPromptParams): string {
 
   students.forEach((student, si) => {
     const ev = evalMap[student.id];
-    if (!ev || ev.isPending) return;
+    if (!ev || ev.isPending || ev.isDirectGrade) return;
 
     const sexoLabel = student.sexo === 'M' ? 'Masculino' : student.sexo === 'F' ? 'Femenino' : 'No especificado';
     const gradeStr = ev.calculatedGrade.toFixed(1);
@@ -158,7 +158,7 @@ export function buildMegaPrompt(params: MegaPromptParams): string {
     feedbacks: students
       .filter(s => {
         const ev = evalMap[s.id];
-        return ev && !ev.isPending;
+        return ev && !ev.isPending && !ev.isDirectGrade;
       })
       .map(s => ({
         studentId: s.id,

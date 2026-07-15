@@ -317,7 +317,7 @@ export function EvaluationView() {
                       ) : (
                         <span className={styles.feedbackPending}>—</span>
                       )}
-                      {!ev?.isPending && ev && (
+                      {!ev?.isPending && !ev?.isDirectGrade && ev && (
                         <button
                           className={styles.miniPromptBtn}
                           title="Generar prompt IA individual"
