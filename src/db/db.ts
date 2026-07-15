@@ -97,6 +97,7 @@ export interface Evaluation {
   isPending?: boolean;
   aiFeedback: AIFeedback | null;
   observations?: string;
+  isDirectGrade?: boolean;
 }
 
 /* ── Base de Datos ── */

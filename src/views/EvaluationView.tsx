@@ -52,7 +52,68 @@ export function EvaluationView() {
     const rawScore = calcRawScore(newScores);
     const calculatedGrade = calculateGrade(rawScore, activeRubric.gradingConfig);
 
-    const updatedEv = { ...ev, scores: newScores, rawScore, calculatedGrade, isPending: false };
+    const updatedEv = { 
+      ...ev, 
+      scores: newScores, 
+      rawScore, 
+      calculatedGrade, 
+      isPending: false,
+      isDirectGrade: false // si usa rúbrica, quitamos la nota directa
+    };
+
+    setSaving(studentId);
+    try {
+      await db.evaluations.put(updatedEv);
+      setEvaluations(evaluations.map(e => e.studentId === studentId ? updatedEv : e));
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const handleDirectGradeToggle = async (studentId: string, currentEv: any) => {
+    // Si no hay evaluación, no podemos hacer mucho aún, o creamos una pendiente
+    if (!currentEv) return;
+
+    const isDirectNow = !currentEv.isDirectGrade;
+    const updatedEv = {
+      ...currentEv,
+      isDirectGrade: isDirectNow,
+      isPending: false,
+    };
+
+    if (isDirectNow) {
+      // Al activar, borramos puntajes y feedback
+      updatedEv.scores = {};
+      updatedEv.rawScore = 0;
+      updatedEv.aiFeedback = null;
+      // Mantenemos la nota que tenga o ponemos la mínima
+      if (!updatedEv.calculatedGrade) updatedEv.calculatedGrade = activeRubric.gradingConfig.nmin;
+    } else {
+      // Al desactivar, recalculamos en base a los scores (que ahora están vacíos)
+      updatedEv.isPending = true;
+      updatedEv.calculatedGrade = 0;
+    }
+
+    setSaving(studentId);
+    try {
+      await db.evaluations.put(updatedEv);
+      setEvaluations(evaluations.map(e => e.studentId === studentId ? updatedEv : e));
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const handleDirectGradeChange = async (studentId: string, currentEv: any, newGrade: number) => {
+    if (!currentEv) return;
+    
+    // Limitar la nota a los rangos permitidos
+    const { nmin, nmax } = activeRubric.gradingConfig;
+    const boundedGrade = Math.max(nmin, Math.min(nmax, newGrade));
+
+    const updatedEv = {
+      ...currentEv,
+      calculatedGrade: boundedGrade
+    };
 
     setSaving(studentId);
     try {
@@ -168,25 +229,33 @@ export function EvaluationView() {
                   {activeRubric.rubricData.criteria.map((crit) => {
                     const currentLevelId = ev?.scores[crit.id]?.levelId;
                     const isPendingCell = ev?.isPending;
+                    const isDirect = ev?.isDirectGrade;
+
                     return (
                       <td key={crit.id} className={styles.tdCriterion}>
-                        <div className={styles.levelButtons}>
-                          {levels.map((level, li) => {
-                            const isSelected = !isPendingCell && currentLevelId === level.id;
-                            return (
-                              <button
-                                key={level.id}
-                                className={`${styles.levelBtn} ${isSelected ? styles.levelBtnSelected : ''}`}
-                                style={isSelected ? { background: LEVEL_COLORS[li % LEVEL_COLORS.length] + '22', borderColor: LEVEL_COLORS[li % LEVEL_COLORS.length] } : {}}
-                                onClick={() => handleScoreChange(student.id, crit.id, level.id)}
-                                title={`${level.label}: ${crit.descriptors[level.id] ?? ''}`}
-                                aria-pressed={isSelected}
-                              >
-                                {level.maxScore}
-                              </button>
-                            );
-                          })}
-                        </div>
+                        {isDirect ? (
+                          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', textAlign: 'center' }}>
+                            Manual
+                          </div>
+                        ) : (
+                          <div className={styles.levelButtons}>
+                            {levels.map((level, li) => {
+                              const isSelected = !isPendingCell && currentLevelId === level.id;
+                              return (
+                                <button
+                                  key={level.id}
+                                  className={`${styles.levelBtn} ${isSelected ? styles.levelBtnSelected : ''}`}
+                                  style={isSelected ? { background: LEVEL_COLORS[li % LEVEL_COLORS.length] + '22', borderColor: LEVEL_COLORS[li % LEVEL_COLORS.length] } : {}}
+                                  onClick={() => handleScoreChange(student.id, crit.id, level.id)}
+                                  title={`${level.label}: ${crit.descriptors[level.id] ?? ''}`}
+                                  aria-pressed={isSelected}
+                                >
+                                  {level.maxScore}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
                       </td>
                     );
                   })}
@@ -203,15 +272,42 @@ export function EvaluationView() {
                   </td>
 
                   <td className={styles.tdGrade}>
-                    {saving === student.id ? (
-                      <span className={styles.savingIndicator}>...</span>
-                    ) : ev?.isPending ? (
-                      <span className={styles.pendingBadge}>Pendiente</span>
-                    ) : (
-                      <span className={`${styles.grade} ${approved ? styles.approved : styles.failed}`}>
-                        {ev ? grade.toFixed(1) : '—'}
-                      </span>
-                    )}
+                    <div className={styles.gradeContainer}>
+                      {saving === student.id ? (
+                        <span className={styles.savingIndicator}>...</span>
+                      ) : ev?.isPending && !ev?.isDirectGrade ? (
+                        <span className={styles.pendingBadge}>Pendiente</span>
+                      ) : ev?.isDirectGrade ? (
+                        <input
+                          type="number"
+                          className={styles.directGradeInput}
+                          value={ev.calculatedGrade || ''}
+                          min={config.nmin}
+                          max={config.nmax}
+                          step="0.1"
+                          onChange={e => handleDirectGradeChange(student.id, ev, parseFloat(e.target.value))}
+                          onBlur={e => {
+                            if (isNaN(parseFloat(e.target.value))) {
+                              handleDirectGradeChange(student.id, ev, config.nmin);
+                            }
+                          }}
+                        />
+                      ) : (
+                        <span className={`${styles.grade} ${approved ? styles.approved : styles.failed}`}>
+                          {ev ? grade.toFixed(1) : '—'}
+                        </span>
+                      )}
+                      
+                      {ev && (
+                        <button 
+                          className={`${styles.directGradeBtn} ${ev.isDirectGrade ? styles.directGradeBtnActive : ''}`}
+                          onClick={() => handleDirectGradeToggle(student.id, ev)}
+                          title={ev.isDirectGrade ? "Volver a Rúbrica" : "Ingresar Nota Directa"}
+                        >
+                          ✍️
+                        </button>
+                      )}
+                    </div>
                   </td>
 
                   <td className={styles.tdFeedback}>

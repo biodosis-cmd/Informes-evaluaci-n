@@ -215,6 +215,42 @@
 .grade { font-size: 1.125rem; font-weight: 800; font-family: var(--font-mono); }
 .approved { color: var(--color-success-400); }
 .failed   { color: var(--color-danger-400); }
+
+.gradeContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.directGradeInput {
+  width: 60px;
+  text-align: center;
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 1.125rem;
+  padding: 0.2rem;
+}
+.directGradeInput:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+}
+
+.directGradeBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: all 0.2s;
+  font-size: 1rem;
+  padding: 2px;
+}
+.directGradeBtn:hover { opacity: 1; transform: scale(1.1); }
+.directGradeBtnActive { opacity: 1; filter: drop-shadow(0 0 2px var(--color-primary-500)); }
 .savingIndicator { color: var(--color-text-disabled); font-size: 0.875rem; animation: pulse 1s ease infinite; }
 
 .pendingBadge {
