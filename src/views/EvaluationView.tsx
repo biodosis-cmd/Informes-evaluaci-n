@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/db';
-import type { ScoreEntry } from '../db/db';
+import type { ScoreEntry, Student, Evaluation } from '../db/db';
 import { useStore } from '../store/useStore';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
@@ -9,10 +10,16 @@ import { buildSingleStudentPrompt } from '../megaprompt/MegaPromptBuilder';
 import styles from './EvaluationView.module.css';
 
 export function EvaluationView() {
-  const { activeRubric, activeCourse, students, evaluations, setEvaluations, setView, teacher, addToast } = useStore();
+  const { activeRubric, activeCourse, students, setStudents, evaluations, setEvaluations, setView, teacher, addToast } = useStore();
   const [saving, setSaving] = useState<string | null>(null);
   const [obsModalId, setObsModalId] = useState<string | null>(null);
   const [obsText, setObsText] = useState('');
+
+  // Estados para nuevo alumno
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addName, setAddName] = useState('');
+  const [addRut, setAddRut] = useState('');
+  const [addSexo, setAddSexo] = useState<'M'|'F'|''>('');
 
   if (!activeRubric || !activeCourse) {
     return (
@@ -145,6 +152,56 @@ export function EvaluationView() {
     }
   };
 
+  const handleAddStudent = async () => {
+    if (!addName.trim() || !addSexo) {
+      addToast({ type: 'error', message: 'Nombre y sexo son obligatorios' });
+      return;
+    }
+
+    if (!activeRubric || !activeCourse) return;
+
+    const newStudentId = uuidv4();
+    const newStudent: Student = {
+      id: newStudentId,
+      courseId: activeCourse.id,
+      name: addName.trim(),
+      rut: addRut.trim(),
+      sexo: addSexo as 'M' | 'F',
+      order: students.length,
+    };
+
+    const newEvaluation: Evaluation = {
+      id: uuidv4(),
+      studentId: newStudentId,
+      courseId: activeCourse.id,
+      rubricId: activeRubric.id,
+      completedAt: Date.now(),
+      scores: {},
+      rawScore: 0,
+      maxRawScore: activeRubric.rubricData.levels[0]?.maxScore * activeRubric.rubricData.criteria.length || 0,
+      calculatedGrade: 0,
+      isPending: true,
+      aiFeedback: null,
+    };
+
+    try {
+      await db.students.add(newStudent);
+      await db.evaluations.add(newEvaluation);
+      
+      setStudents([...students, newStudent]);
+      setEvaluations([...evaluations, newEvaluation]);
+      
+      setIsAddModalOpen(false);
+      setAddName('');
+      setAddRut('');
+      setAddSexo('');
+      
+      addToast({ type: 'success', message: `Estudiante ${newStudent.name} añadido correctamente` });
+    } catch (err) {
+      addToast({ type: 'error', message: 'Error al guardar el nuevo estudiante' });
+    }
+  };
+
   const completedCount = evaluations.filter(ev => {
     if (ev.isPending) return false;
     const scoredCount = Object.keys(ev.scores).length;
@@ -182,7 +239,6 @@ export function EvaluationView() {
         </div>
       </div>
 
-      {/* Leyenda de niveles */}
       <div className={styles.legend}>
         {levels.map((level, i) => (
           <div key={level.id} className={styles.legendItem}>
@@ -193,7 +249,6 @@ export function EvaluationView() {
         ))}
       </div>
 
-      {/* Grilla */}
       <div className={styles.gridWrap}>
         <table className={styles.grid}>
           <thead>
@@ -353,6 +408,7 @@ export function EvaluationView() {
         </span>
         <div className={styles.bottomActions}>
           <Button variant="secondary" onClick={() => setView('course-setup')} icon="←">Volver</Button>
+          <Button variant="secondary" onClick={() => setIsAddModalOpen(true)} icon="➕">Agregar Alumno</Button>
           <Button onClick={() => setView('mega-prompt')} icon="🤖">Generar Mega Prompt</Button>
         </div>
       </div>
@@ -369,17 +425,61 @@ export function EvaluationView() {
           </>
         }
       >
-        <p className={styles.modalText}>
-          Escribe aquí cualquier situación particular (ej. "el estudiante estaba enfermo", "hubo un problema técnico")
-          que deba considerarse para la retroalimentación pedagógica, sin afectar su nota.
-        </p>
         <textarea
           className={styles.obsTextarea}
           value={obsText}
           onChange={e => setObsText(e.target.value)}
-          placeholder="Escribe tus observaciones aquí..."
+          placeholder="Escribe aquí anotaciones, justificaciones o cualquier contexto adicional para la evaluación de este estudiante..."
           rows={5}
         />
+      </Modal>
+
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Agregar Nuevo Estudiante"
+        size="md"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setIsAddModalOpen(false)}>Cancelar</Button>
+            <Button variant="primary" onClick={handleAddStudent}>Guardar</Button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '0.5rem 0' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Nombres y Apellidos *</label>
+            <input 
+              type="text" 
+              value={addName} 
+              onChange={e => setAddName(e.target.value)} 
+              placeholder="Ej. Juan Pérez" 
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--color-border-strong)', background: 'var(--color-bg-base)', color: 'var(--color-text-primary)' }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>RUT (Opcional)</label>
+            <input 
+              type="text" 
+              value={addRut} 
+              onChange={e => setAddRut(e.target.value)} 
+              placeholder="Ej. 12345678-9" 
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--color-border-strong)', background: 'var(--color-bg-base)', color: 'var(--color-text-primary)' }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Sexo *</label>
+            <select 
+              value={addSexo} 
+              onChange={e => setAddSexo(e.target.value as 'M'|'F')} 
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--color-border-strong)', background: 'var(--color-bg-base)', color: 'var(--color-text-primary)' }}
+            >
+              <option value="">-- Seleccionar --</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+        </div>
       </Modal>
     </div>
   );
